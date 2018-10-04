@@ -1,0 +1,68 @@
+.mainPhoto
+{
+    max-width: 100%;
+    height: auto;
+}
+
+.sub-photo-left-view {
+    margin-right: 60px;
+    margin-bottom: 120px;
+    width: 500px;
+    float: left;
+    display: block;
+}
+.content{
+     color: #212124;
+     top: 17px;
+     font-size: 20px;
+     font-weight: 600;
+     margin-left: 0;
+     padding-left: 5px;
+     max-width: 500px;
+     width: auto;
+}
+.sub-content{
+    color: #212124;
+    top: 17px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-left: 0;
+    max-width: 500px;
+    width: auto;
+}
+.decription{
+    color: #212124;
+    top: 20px;
+    font-size: 13px;
+    font-weight: 400;
+    margin-left: 0;
+    max-width: 500px;
+    width: auto;
+}
+
+.tag-view {
+    float: left;
+    width: 500px;
+    display: block;
+    right: 0px;
+}
+
+a.tag{
+    padding: 2px;
+    margin: 2px;
+    float: left;
+    display:block;
+    background-color: #bbbdbe;
+    color: #212124;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+a.tag:hover
+{
+    cursor: pointer;
+    background-color: #212124;
+    color: #fcfeff !important;
+    border-radius: 5px;
+    transition-duration: 0.5s;
+}
