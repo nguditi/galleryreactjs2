@@ -20,6 +20,7 @@ class Tag extends Component {
             searchTag = 'vietnam'
         }
         if (searchTag !== this.props.tag) {
+            this.props.changeTag(searchTag);
             let res = await axios.get(api.baseUrl + `api_key=` + api.key + `&extras=` + api.extras
                 + `&per_page=40&page=1&tags=`+ searchTag + `&text=`+ searchTag +`&sort=relevance&safe_search=1&format=json&nojsoncallback=1`);
             let data = res.data.photos.photo;
@@ -31,7 +32,6 @@ class Tag extends Component {
             });
             let maxpg = res.data.photos["pages"];
             this.props.setMaxpage(maxpg);
-            this.props.changeTag(searchTag);
             this.props.cleanPhoto();
             this.props.addPhoto(realList);
         }
