@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import * as Action from  '../Actions/index';
+import {connect} from  'react-redux';
 import './explore.css';
 import axios from 'axios';
 import Gallery from 'react-grid-gallery';
@@ -10,10 +12,6 @@ const api = {
 };
 
 class Tag extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {pics: [], requestSent: false, page: 1, maxpage:0, tag:''};
-    }
 
     async loadPage()
     {
@@ -21,7 +19,7 @@ class Tag extends Component {
         if (!searchTag) {
             searchTag = 'vietnam'
         }
-        if (searchTag !== this.state.tag) {
+        if (searchTag !== this.props.tag) {
             let res = await axios.get(api.baseUrl + `api_key=` + api.key + `&extras=` + api.extras
                 + `&per_page=40&page=1&tags=`+ searchTag + `&text=`+ searchTag +`&sort=relevance&safe_search=1&format=json&nojsoncallback=1`);
             let data = res.data.photos.photo;
@@ -32,8 +30,10 @@ class Tag extends Component {
                 return true;
             });
             let maxpg = res.data.photos["pages"];
-            this.setState({tag: searchTag})
-            this.setState({pics: realList,maxpage: maxpg,page: 2});
+            this.props.setMaxpage(maxpg);
+            this.props.changeTag(searchTag);
+            this.props.cleanPhoto();
+            this.props.addPhoto(realList);
         }
     }
 
@@ -50,23 +50,24 @@ class Tag extends Component {
 
     componentWillUnmount() {
         window.removeEventListener('scroll',this.handleOnScroll);
+        this.props.cleanPhoto();
+        this.props.changeTag('');
     }
 
     doQuery = async() => {
-        if (this.state.page > this.state.maxpage)
+        if (this.props.page > this.props.maxpage)
             return;
         let res = await axios.get(api.baseUrl + `api_key=` + api.key + `&extras=` + api.extras
-            + `&per_page=20&page=` + this.state.page + `&tags=`+ this.state.tag +`&sort=relevance&safe_search=1&format=json&nojsoncallback=1`);
-        let data = this.state.pics.concat(res.data.photos.photo);
+            + `&per_page=40&page=` + this.props.page + `&tags=`+ this.props.tag + `&text=`+  this.props.tag +`&sort=relevance&safe_search=1&format=json&nojsoncallback=1`);
+        let data = res.data.photos.photo;
         let realList = data.filter((img) =>
         {
             if (!img.url_l)
                 return false;
             return true;
         });
-        this.setState({pics: realList});
-        let pg = this.state.page + 1;
-        this.setState({page: pg, requestSent: false});
+        this.props.setRequesting(false);
+        this.props.addPhoto(realList);
     }
 
     handleOnScroll= () => {
@@ -77,24 +78,25 @@ class Tag extends Component {
         let scrolledToBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
 
         if (scrolledToBottom) {
-            if (this.state.requestSent) {
+            if (this.props.requestSent) {
                 return;
             }
             // enumerate a slow query
             setTimeout(this.doQuery, 1000);
-            this.setState({requestSent: true});
+            this.props.setRequesting(true);
+
         }
     }
 
     jumptoDetail(i)
     {
-        this.props.history.push(`/detail/`+this.state.pics[i].id);
+        this.props.history.push(`/detail/`+this.props.pics[i].id);
     }
 
     render() {
         return (
             <Container>
-                <Gallery enableImageSelection={false} rowHeight={280} onClickThumbnail = {(e)=>this.jumptoDetail(e)} images={this.state.pics.map((photo) =>
+                <Gallery enableImageSelection={false} rowHeight={280} onClickThumbnail = {(e)=>this.jumptoDetail(e)} images={this.props.pics.map((photo) =>
                 {
                     let width = parseInt(photo.width_l,10);
                     let height = parseInt(photo.height_l,10);
@@ -112,7 +114,7 @@ class Tag extends Component {
                 })}/>
                 {
                     (()=> {
-                        if (this.state.requestSent) {
+                        if (this.props.requestSent) {
                             return (
                                 <div className="loading">Loading&#8230;</div>
                             );
@@ -123,4 +125,36 @@ class Tag extends Component {
         );
     }
 }
-export default Tag;
+
+const mapStateToProps = (state) => {
+    return {
+        pics: state.updatePhoto.photo,
+        page: state.updatePhoto.page,
+        tag: state.changeTag,
+        requestSent: state.setRequesting,
+        maxpage: state.maxPage,
+    }
+}
+
+const mapDispatchToProps = (dispatch, action) => {
+    return {
+        addPhoto: (realList) => {
+            dispatch(Action.addPhoto(realList));
+        },
+        cleanPhoto: () => {
+            dispatch(Action.cleanPhoto());
+        },
+        changeTag: (tag) => {
+            dispatch(Action.changeTag(tag));
+        },
+        setRequesting: (isReq) => {
+            dispatch(Action.setRequesting(isReq));
+        },
+        setMaxpage: (maxpage) => {
+            dispatch(Action.setMaxpage(maxpage));
+        }
+
+}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tag);

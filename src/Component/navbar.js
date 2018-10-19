@@ -6,7 +6,6 @@ import {
 import {
     Collapse,
     Navbar,
-    NavbarBrand,
     Nav,
     NavbarToggler,
     Input,
@@ -50,7 +49,7 @@ class MyNav extends Component {
         return (
             <div>
                 <Navbar color="dark" dark expand="md">
-                    <NavbarBrand href="/">Gallery</NavbarBrand>
+                    <Link to="/" className = "navbar-brand">Gallery</Link>
                     <NavbarToggler onClick={this.toggle} />
                     <Collapse isOpen={this.state.isOpen} navbar>
                         <Nav className="ml-auto" navbar>

@@ -1,0 +1,5 @@
+export const CLEAN_PHOTO = 'CLEAN_PHOTO'
+export const ADD_PHOTO = 'ADD_PHOTO'
+export const CHANGE_TAG = 'CHANGE_TAG'
+export const SET_REQUEST = 'SET_REQUEST'
+export const SET_MAXPAGE = 'SET_MAXPAGE'
